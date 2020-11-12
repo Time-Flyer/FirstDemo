@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
                 adapter = new Adapter(this, dataList);
-                recyclerView.setAdapter(adapter)
+                recyclerView.setAdapter(adapter);
             }
         });
 
