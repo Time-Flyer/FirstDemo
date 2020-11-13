@@ -1,14 +1,14 @@
 package com.example.firstdemo;
 
 public class ImgAndTxt {
-    private String img;
+    private int img;
     private String text;
 
-    public String getImg() {
+    public int getImg() {
         return img;
     }
 
-    public void setImg(String img) {
+    public void setImg(int img) {
         this.img = img;
     }
 

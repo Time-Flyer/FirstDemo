@@ -1,13 +1,14 @@
 package com.example.firstdemo;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
     private Button btn_change_layout;
     private Button btn_insert_data;
     private Button btn_del_data;
+
+    private static int layoutFlag = 0;
 
     private List<ImgAndTxt> dataList;
 
@@ -42,20 +45,47 @@ public class MainActivity extends AppCompatActivity {
                 recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
                 adapter = new Adapter(this, dataList);
+                adapter.setLayoutFlag(false);
+                adapter.setOnItemClickListener((view, pos) -> {
+                    Toast.makeText(this, "点击了第" + pos + "个item", Toast.LENGTH_SHORT).show();
+                });
                 recyclerView.setAdapter(adapter);
             }
         });
 
         btn_change_layout.setOnClickListener(v -> {
-            Toast.makeText(this, "按钮2", Toast.LENGTH_SHORT).show();
+            if (recyclerView == null) {
+                Toast.makeText(this, "请先添加数据", Toast.LENGTH_SHORT).show();
+            } else {
+                if (layoutFlag == 0) {
+                    adapter.setLayoutFlag(false);
+                    recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+                    layoutFlag = 1;
+                } else if (layoutFlag == 1) {
+                    adapter.setLayoutFlag(true);
+                    recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                    layoutFlag = 2;
+                } else {
+                    adapter.setLayoutFlag(false);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                    layoutFlag = 0;
+                }
+            }
         });
 
         btn_insert_data.setOnClickListener(v -> {
-            Toast.makeText(this, "按钮3", Toast.LENGTH_SHORT).show();
+            ImgAndTxt data = new ImgAndTxt();
+            data.setImg(R.drawable.wangwang);
+            data.setText("新建item");
+            dataList.add(3, data);
+            adapter.notifyDataSetChanged();
         });
 
         btn_del_data.setOnClickListener(v -> {
-            Toast.makeText(this, "按钮4", Toast.LENGTH_SHORT).show();
+            if (dataList.get(3).getText().equals("新建item")) {
+                dataList.remove(3);
+                adapter.notifyDataSetChanged();
+            }
         });
     }
 
@@ -68,10 +98,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         dataList = new ArrayList<>();
-        for (int i = 1; i <= 20; i++) {
+        for (int i = 0; i <= 20; i++) {
             ImgAndTxt data = new ImgAndTxt();
-            data.setImg("");
-            data.setText("第" + i + "条数据");
+            if (i % 2 == 0) {
+                data.setImg(R.drawable.tom);
+            } else {
+                data.setImg(R.drawable.xiaoxin);
+            }
+            data.setText("第" + (i+1) + "条数据");
             dataList.add(data);
         }
     }
