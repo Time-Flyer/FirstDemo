@@ -1,6 +1,7 @@
 package com.example.firstdemo;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,8 @@ import java.util.List;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
-    public static enum ITEM_TYPE {
+    //这里使用了枚举，但是后续实际上也是用到它的序数进行判断。直接使用int类型常量即可
+    public enum ITEM_TYPE {
         ITEM_TYPE_FIRST,
         ITEM_TYPE_SECOND
     }
@@ -43,7 +45,13 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.imageView.setImageResource(dataList.get(position).getImg());
         holder.textView.setText(dataList.get(position).getText());
-        holder.itemLine.setOnClickListener(v -> listener.onItemClick(v, position));
+        holder.itemLine.setOnClickListener(v -> {
+            Log.i("pos", "layout pos " + position);
+            Log.i("pos", "old pos " + holder.getOldPosition());
+            Log.i("pos", "layout pos " + holder.getAdapterPosition());
+            Log.i("pos", "layout pos " + holder.getLayoutPosition());
+            listener.onItemClick(v, position);
+        });
     }
 
     @Override

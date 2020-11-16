@@ -15,90 +15,107 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final int LAYOUT_FLAG_LINER_LAYOUT = 0;
+    private final int LAYOUT_FLAG_GRID_LAYOUT = 1;
+    private final int LAYOUT_FLAG_STAGGERED_GRID_LAYOUT = 2;
+
+    private static int layoutFlag = 0;
+
     private Button btn_add_data;
     private Button btn_change_layout;
     private Button btn_insert_data;
     private Button btn_del_data;
 
-    private static int layoutFlag = 0;
+    //todo 全局变量可以使用mDataList、mAdapter、mRecyclerView等
+    //todo 局部变量可以使用dataList、adapter等
+    private List<ImgAndTxt> mDataList = new ArrayList<>();
 
-    private List<ImgAndTxt> dataList;
-
-    private RecyclerView recyclerView;
-    private Adapter adapter;
+    private RecyclerView mRecyclerView;
+    private Adapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initView();
-        btnListener();
+        initData();
+        initViews();
+        initEvents();
     }
 
-    private void btnListener() {
+    private void initEvents() {
         btn_add_data.setOnClickListener(v -> {
-            if (dataList == null) {
-                initData();
-
-                recyclerView = findViewById(R.id.recycler_view);
-                recyclerView.setHasFixedSize(true);
-                recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-                adapter = new Adapter(this, dataList);
-                adapter.setLayoutFlag(false);
-                adapter.setOnItemClickListener((view, pos) -> {
+            if (mAdapter == null) {
+                mAdapter = new Adapter(this, mDataList);
+                mAdapter.setLayoutFlag(false);
+                mAdapter.setOnItemClickListener((view, pos) -> {
                     Toast.makeText(this, "点击了第" + pos + "个item", Toast.LENGTH_SHORT).show();
                 });
-                recyclerView.setAdapter(adapter);
+                mRecyclerView.setAdapter(mAdapter);
             }
         });
 
         btn_change_layout.setOnClickListener(v -> {
-            if (recyclerView == null) {
+            if (mAdapter == null) {
                 Toast.makeText(this, "请先添加数据", Toast.LENGTH_SHORT).show();
             } else {
-                if (layoutFlag == 0) {
-                    adapter.setLayoutFlag(false);
-                    recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-                    layoutFlag = 1;
-                } else if (layoutFlag == 1) {
-                    adapter.setLayoutFlag(true);
-                    recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-                    layoutFlag = 2;
+                //todo 尽量少用魔术数，用具体化的变量代表，比如LAYOUT_FLAG_GRIDLAYOUT等，方便阅读理解
+                if (layoutFlag == LAYOUT_FLAG_LINER_LAYOUT) {
+                    mAdapter.setLayoutFlag(false);
+                    mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+                    layoutFlag = LAYOUT_FLAG_GRID_LAYOUT;
+                } else if (layoutFlag == LAYOUT_FLAG_GRID_LAYOUT) {
+                    mAdapter.setLayoutFlag(true);
+                    mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                    layoutFlag = LAYOUT_FLAG_STAGGERED_GRID_LAYOUT;
                 } else {
-                    adapter.setLayoutFlag(false);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                    layoutFlag = 0;
+                    mAdapter.setLayoutFlag(false);
+                    mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+                    layoutFlag = LAYOUT_FLAG_LINER_LAYOUT;
                 }
             }
         });
 
         btn_insert_data.setOnClickListener(v -> {
-            ImgAndTxt data = new ImgAndTxt();
-            data.setImg(R.drawable.wangwang);
-            data.setText("新建item");
-            dataList.add(3, data);
-            adapter.notifyDataSetChanged();
+            if (mAdapter == null) {
+                Toast.makeText(this, "请先添加数据", Toast.LENGTH_SHORT).show();
+            } else {
+                ImgAndTxt data = new ImgAndTxt();
+                data.setImg(R.drawable.wangwang);
+                data.setText("新建item");
+                //todo 这里直接add，但是你前面的dataList没有初始化，会发生NPE
+                mDataList.add(3, data);
+                mAdapter.notifyDataSetChanged();
+            }
         });
 
         btn_del_data.setOnClickListener(v -> {
-            if (dataList.get(3).getText().equals("新建item")) {
-                dataList.remove(3);
-                adapter.notifyDataSetChanged();
+            //todo 数据使用的时候，不进行判断直接进行crud操作，容易出现错误
+            //这里直接下标操作，发生越界错误，崩溃
+            if (mAdapter == null) {
+                Toast.makeText(this, "请先添加数据", Toast.LENGTH_SHORT).show();
+            } else if (mDataList.size() > 3 && mDataList.get(3).getText().equals("新建item")) {
+                mDataList.remove(3);
+                mAdapter.notifyItemRemoved(3); // TODO 如果没有这句，在 GridLayout 中会闪退，但其他两个又没问题
+                mAdapter.notifyItemRangeChanged(3, mDataList.size() - 3);
             }
         });
     }
 
-    private void initView() {
+    private void initViews() {
         btn_add_data = findViewById(R.id.btn_add_data);
         btn_change_layout = findViewById(R.id.btn_change_layout);
         btn_insert_data = findViewById(R.id.btn_insert_data);
         btn_del_data = findViewById(R.id.btn_del_data);
+
+        mRecyclerView = findViewById(R.id.recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
     private void initData() {
-        dataList = new ArrayList<>();
+//        dataList = new ArrayList<>();
         for (int i = 0; i <= 20; i++) {
+            //todo 这里可以也考虑直接传递构造参数
             ImgAndTxt data = new ImgAndTxt();
             if (i % 2 == 0) {
                 data.setImg(R.drawable.tom);
@@ -106,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 data.setImg(R.drawable.xiaoxin);
             }
             data.setText("第" + (i+1) + "条数据");
-            dataList.add(data);
+            mDataList.add(data);
         }
     }
 
