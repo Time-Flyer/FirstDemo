@@ -28,10 +28,10 @@ public class MainActivity extends AppCompatActivity {
 
     //todo 全局变量可以使用mDataList、mAdapter、mRecyclerView等
     //todo 局部变量可以使用dataList、adapter等
-    private List<ImgAndTxt> mDataList = new ArrayList<>();
+    private final List<ImgAndTxt> mDataList = new ArrayList<>();
 
     private RecyclerView mRecyclerView;
-    private Adapter mAdapter;
+    private KAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +45,11 @@ public class MainActivity extends AppCompatActivity {
     private void initEvents() {
         btn_add_data.setOnClickListener(v -> {
             if (mAdapter == null) {
-                mAdapter = new Adapter(this, mDataList);
-                mAdapter.setLayoutFlag(false);
-                mAdapter.setOnItemClickListener((view, pos) -> {
-                    Toast.makeText(this, "点击了第" + pos + "个item", Toast.LENGTH_SHORT).show();
-                });
+                mAdapter = new KAdapter(this, mDataList);
+                mAdapter.setMLayoutFlag(false);
+//                mAdapter.setOnItemClickListener((view, pos) -> {
+//                    Toast.makeText(this, "点击了第" + pos + "个item", Toast.LENGTH_SHORT).show();
+//                });
                 mRecyclerView.setAdapter(mAdapter);
             }
         });
@@ -60,15 +60,15 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 //todo 尽量少用魔术数，用具体化的变量代表，比如LAYOUT_FLAG_GRIDLAYOUT等，方便阅读理解
                 if (layoutFlag == LAYOUT_FLAG_LINER_LAYOUT) {
-                    mAdapter.setLayoutFlag(false);
+                    mAdapter.setMLayoutFlag(false);
                     mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
                     layoutFlag = LAYOUT_FLAG_GRID_LAYOUT;
                 } else if (layoutFlag == LAYOUT_FLAG_GRID_LAYOUT) {
-                    mAdapter.setLayoutFlag(true);
+                    mAdapter.setMLayoutFlag(true);
                     mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
                     layoutFlag = LAYOUT_FLAG_STAGGERED_GRID_LAYOUT;
                 } else {
-                    mAdapter.setLayoutFlag(false);
+                    mAdapter.setMLayoutFlag(false);
                     mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
                     layoutFlag = LAYOUT_FLAG_LINER_LAYOUT;
                 }
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 data.setImg(R.drawable.xiaoxin);
             }
-            data.setText("第" + (i+1) + "条数据");
+            data.setText("第" + (i) + "条数据");
             mDataList.add(data);
         }
     }
