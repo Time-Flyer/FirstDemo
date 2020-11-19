@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.recycler_item.view.*
 
-class KAdapter(context: Context, private val list: List<ImgAndTxt>) :
+class KAdapter(private val list: List<ImgAndTxt>) :
         RecyclerView.Adapter<KAdapter.ViewHolder>() {
 
     companion object {
@@ -32,7 +32,7 @@ class KAdapter(context: Context, private val list: List<ImgAndTxt>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindVIew(list[position].img, list[position].text)
+        holder.bindView(list[position].img, list[position].text)
         holder.itemView.item_line.setOnClickListener {
             Toast.makeText(holder.itemView.context,
                     "点击了第" + holder.adapterPosition + "个item", Toast.LENGTH_SHORT).show()
@@ -50,7 +50,7 @@ class KAdapter(context: Context, private val list: List<ImgAndTxt>) :
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bindVIew(img: Int, text: String) {
+        fun bindView(img: Int, text: String) {
             itemView.img_view.setImageResource(img)
             itemView.txt_view.text = text
         }

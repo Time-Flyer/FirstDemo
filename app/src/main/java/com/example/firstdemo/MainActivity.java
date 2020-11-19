@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private void initEvents() {
         btn_add_data.setOnClickListener(v -> {
             if (mAdapter == null) {
-                mAdapter = new KAdapter(this, mDataList);
+                mAdapter = new KAdapter(mDataList);
                 mAdapter.setMLayoutFlag(false);
 //                mAdapter.setOnItemClickListener((view, pos) -> {
 //                    Toast.makeText(this, "点击了第" + pos + "个item", Toast.LENGTH_SHORT).show();
